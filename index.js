@@ -154,6 +154,11 @@ client.on("message", async message => {
 
   filterFuckMess.forEach(val => {
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
+      if(message.member.id.some(r=>["329970987388895242","343077307570716674"].includes(r.name)) )
+      {
+        message.channel.send("Sao em dám chửi :D");
+      }
+      else {
         let intRandom = Math.floor(Math.random() * messReply.length);
         var found = countFuck.find(x => x.id === message.author);
         if(!found) {
@@ -177,6 +182,8 @@ client.on("message", async message => {
             message.channel.send(messReply[intRandom] + message.author);
         }
       }
+       
+    }
   })
   // Also good practice to ignore any message that does not start with our prefix, 
   // which is set in the configuration file.
