@@ -61,6 +61,10 @@ client.on("message", async message => {
       "bot ngu",
       "bo t ngu",
       "b o t ngu",
+      'lz',
+      'loz',
+      'lồn',
+      'vcl'
   ];
 
   var messReply = [
