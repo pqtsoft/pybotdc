@@ -69,6 +69,7 @@ client.on("message", async message => {
       "đm tiu",
       "nuxi",
       "cức",
+      "cứt",
       "đm",
       "dcm",
       "đcm",
