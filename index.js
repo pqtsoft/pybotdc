@@ -31,6 +31,19 @@ client.on("guildDelete", guild => {
   client.user.setActivity(`Serving ${client.guilds.size} servers`);
 });
 
+var countFuck = [];
+
+var commands = [
+    "avatar",
+    "ping",
+    "pick",
+    "cht",
+    "play",
+    "say",
+    "kick",
+    "prune"
+];
+
 
 client.on("message", async message => {
   // This event will run on every single message received, from any channel or DM.
@@ -77,7 +90,21 @@ client.on("message", async message => {
 
   filterFuckMess.forEach(val => {
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
-        const intRandom = Math.floor(Math.random() * argsPick.length);
+        let intRandom = Math.floor(Math.random() * messReply.length);
+        var found = countFuck.find(x => x.id === message.author);
+        if(!found) {
+            countFuck.push({
+                id: message.author,
+                count: 1
+            });
+        }
+        else {
+            countFuck[countFuck.indexOf(found)].count = found.count + 1;
+            if(found.count >= 3) {
+                intRandom = 3;
+                countFuck[countFuck.indexOf(found)].count = 0;
+            }
+        }
         if(intRandom === 3) {
             message.channel.send(messReply[intRandom] + message.author);
             message.channel.send(attachment);
@@ -100,6 +127,17 @@ client.on("message", async message => {
   
   // Let's go with a few common example commands! Feel free to delete or change those.
   
+  if(commands.indexOf(command) == -1) {
+    var request = require('request');
+    request('http://sandbox.api.simsimi.com/request.p?key=0bf9c6ca-0039-4701-be36-ad22b750201d&lc=en&ft=1.0&text=' + encodeURI(message.content.replace('+', '')), function (error, response, body) {
+        
+        const obj = JSON.parse(body);    
+        
+        message.channel.send(obj.response);
+    });
+    
+  }
+
   if(command === "avatar") {
     let member = message.mentions.users.first() || message.author;
 
