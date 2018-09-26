@@ -108,6 +108,46 @@ client.on("message", async message => {
     "Cẩn thận bố mày đấy "
   ];
 
+  var fightMess = [
+    'đánh nhau',
+    'sợ à',
+    'sao chửi tao',
+    'sao m chửi tao',
+
+  ];
+
+  var messFightReply = [
+    "Dutdit cho nó văn hóa, đánh đấm gì?",
+    "Chịch không?",
+    "M nằm dưới nhé?"
+  ];
+
+  var handsomeMess = [
+    "đẹp trai ko",
+    "đẹp trai không",
+    "đẹp trai hok",
+    "đẹp trai hk",
+    "đẹp gái ko",
+    "đẹp gái không",
+    "đẹp gái hok",
+    "đẹp gái hk",
+    
+  ];
+
+  handsomeMess.forEach(val => {
+    if(message.content.indexOf(val) != -1) {
+      message.channel.send("Đéo " + message.author);
+
+    }
+  });
+
+  fightMess.forEach(val => {
+    if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
+      let intRandom = Math.floor(Math.random() * messFightReply.length);
+      message.channel.send(messFightReply[intRandom] + message.author);
+    }
+  })
+
   filterFuckMess.forEach(val => {
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
         let intRandom = Math.floor(Math.random() * messReply.length);
