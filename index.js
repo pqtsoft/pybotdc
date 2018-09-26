@@ -63,9 +63,16 @@ client.on("message", async message => {
       "b o t ngu",
   ];
 
+  var messReply = [
+    "Chửi cl, im đê ",
+    "Là người có văn hóa tí đê, ko chửi bậy, dcmm ",
+    "Channel trong sáng, đừng chửi bậy nhé, dcmm ",
+
+  ];
+
   filterFuckMess.forEach(val => {
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
-        message.channel.send("Chửi cl, im đê " + message.author);
+        message.channel.send(messReply[Math.floor(Math.random() * messReply.length)] + message.author);
       }
   })
   // Also good practice to ignore any message that does not start with our prefix, 
