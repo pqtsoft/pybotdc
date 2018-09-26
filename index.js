@@ -79,11 +79,8 @@ client.on("message", async message => {
       "dcm",
       "đcm",
       "đệch",
-      "mé",
       "móa",
-      "má",
       "đậu xanh",
-      "vồn",
       "vãi nồi",
       "dkm",
       "đù",
@@ -161,7 +158,7 @@ client.on("message", async message => {
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
       if(["329970987388895242","343077307570716674"].find(x => x == message.author.id))
       {
-        message.channel.send("Sao em dám chửi :D");
+        //message.channel.send("Sao em dám chửi :D");
       }
       else {
         let intRandom = Math.floor(Math.random() * messReply.length);
@@ -182,9 +179,11 @@ client.on("message", async message => {
         if(intRandom === 3) {
             message.channel.send(messReply[intRandom] + message.author);
             message.channel.send(attachment);
+            break;
         }
         else {
             message.channel.send(messReply[intRandom] + message.author);
+            break;
         }
       }
        
