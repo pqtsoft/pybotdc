@@ -249,6 +249,12 @@ client.on("message", async message => {
     message.delete().catch(O_o=>{}); 
     message.channel.send("Chửi cl, chịch không? " + HT);
   }
+
+  if(command === 'cht2') {
+    const HT = message.guild.members.find(x => x.id == '376286646011822082');
+    message.delete().catch(O_o=>{}); 
+    message.channel.send(messFightReply[Math.floor(Math.random() * messFightReply.length)] + HT);
+  }
   
   if(command === 'play') {
     if (message.member.voiceChannel) {
