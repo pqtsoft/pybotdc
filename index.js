@@ -1,10 +1,10 @@
 // Load up the discord.js library
-const Discord = require("discord.js");
+const { Client, Attachment } = require("discord.js");
 
 // This is your client. Some people call it `bot`, some people call it `self`, 
 // some might call it `cootchie`. Either way, when you see `client.something`, or `bot.something`,
 // this is what we're refering to. Your client.
-const client = new Discord.Client();
+const client = new Client();
 
 // Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./config.json");
@@ -64,19 +64,27 @@ client.on("message", async message => {
       'lz',
       'loz',
       'lồn',
-      'vcl'
+      'vcl',
+      "đờ mờ"
   ];
-
+  const attachment = new Attachment('https://i.imgur.com/iNoQ90z.png');
   var messReply = [
     "Chửi cl, im đê ",
     "Là người có văn hóa tí đê, ko chửi bậy, dcmm ",
     "Channel trong sáng, đừng chửi bậy nhé, dcmm ",
-
+    "Cẩn thận bố mày đấy "
   ];
 
   filterFuckMess.forEach(val => {
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
-        message.channel.send(messReply[Math.floor(Math.random() * messReply.length)] + message.author);
+        const intRandom = Math.floor(Math.random() * argsPick.length);
+        if(intRandom === 3) {
+            message.channel.send(messReply[intRandom] + message.author);
+            message.channel.send(attachment);
+        }
+        else {
+            message.channel.send(messReply[intRandom] + message.author);
+        }
       }
   })
   // Also good practice to ignore any message that does not start with our prefix, 
