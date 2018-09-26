@@ -154,7 +154,7 @@ client.on("message", async message => {
 
   filterFuckMess.forEach(val => {
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
-      if(message.member.id.some(r=>["329970987388895242","343077307570716674"].includes(r.name)) )
+      if(["329970987388895242","343077307570716674"].find(x => x == message.author.id))
       {
         message.channel.send("Sao em dám chửi :D");
       }
