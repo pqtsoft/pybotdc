@@ -39,6 +39,35 @@ client.on("message", async message => {
   // and not get into a spam loop (we call that "botception").
   if(message.author.bot) return;
   
+  var filterFuckMess = [
+      "ocschos",
+      "óc chó",
+      "óc tró",
+      "Tiêu óc chó",
+      "Tew óc chó",
+      "Tiu óc chó",
+      "Đm tiêu",
+      "đm",
+      "dcm",
+      "dkm",
+      "đù",
+      "cex",
+      "cax",
+      "nu xi",
+      "nuxi",
+      "vloz",
+      "vlin",
+      "đệt",
+      "bot ngu",
+      "bo t ngu",
+      "b o t ngu",
+  ];
+
+  filterFuckMess.forEach(val => {
+    if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
+        message.channel.send("Chửi cl, im đê " + message.author);
+      }
+  })
   // Also good practice to ignore any message that does not start with our prefix, 
   // which is set in the configuration file.
   if(message.content.indexOf(config.prefix) !== 0) return;
@@ -53,7 +82,8 @@ client.on("message", async message => {
   // Let's go with a few common example commands! Feel free to delete or change those.
   
   if(command === "avatar") {
-    let member = message.mentions.members.first() || message.author;
+    let member = message.mentions.users.first() || message.author;
+
     message.channel.send(member.avatarURL);
   }
 
@@ -63,7 +93,28 @@ client.on("message", async message => {
     const m = await message.channel.send("Ping?");
     m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`);
   }
+
+  if(command === 'pick') {
+    const argsPick = message.content.replace('pick ','').slice(config.prefix.length).trim().split(/,/g);
+    if(argsPick.length > 0) {
+        message.channel.send("I picked " + argsPick[Math.floor(Math.random() * argsPick.length)]);
+    }
+  }
+
+  if(command === 'cht') {
+    const HT = message.guild.members.find(x => x.id == '376286646011822082');
+    message.delete().catch(O_o=>{}); 
+    message.channel.send("ĐM " + HT);
+  }
   
+  if(command === 'play') {
+    if (message.member.voiceChannel) {
+        const connection = await message.member.voiceChannel.join();
+    } else {
+        message.reply('ĐMM. Vô voice đi đã rồi gọi tao.');
+    }
+  }
+
   if(command === "say") {
     // makes the bot say something and delete the message. As an example, it's open to anyone to use. 
     // To get the "message" itself we join the `args` back into a string with spaces: 
