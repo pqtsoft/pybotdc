@@ -154,7 +154,8 @@ client.on("message", async message => {
     }
   })
 
-  filterFuckMess.forEach(val => {
+  for(var i = 0; i < filterFuckMess.length; i++) {
+    const val =filterFuckMess[i];
     if(message.content.toLowerCase().indexOf(val.toLowerCase()) != -1) {
       if(["329970987388895242","343077307570716674"].find(x => x == message.author.id))
       {
@@ -188,7 +189,7 @@ client.on("message", async message => {
       }
        
     }
-  })
+  }
   // Also good practice to ignore any message that does not start with our prefix, 
   // which is set in the configuration file.
   if(message.content.indexOf(config.prefix) !== 0) return;
