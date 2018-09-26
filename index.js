@@ -59,6 +59,8 @@ client.on("message", async message => {
       "Tiu ngu",
       "stew ngu",
       "Tiu nuxi",
+      "nunu",
+      "vc",
       "Tiêu óc chó",
       "Tew óc chó",
       "Tiu óc chó",
