@@ -78,6 +78,7 @@ client.on("message", async message => {
       'loz',
       'lồn',
       'vcl',
+      'vl',
       "đờ mờ"
   ];
   const attachment = new Attachment('https://i.imgur.com/iNoQ90z.png');
