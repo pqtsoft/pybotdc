@@ -79,7 +79,10 @@ client.on("message", async message => {
       'lồn',
       'vcl',
       'vl',
-      "đờ mờ"
+      "đờ mờ",
+      "chó",
+      "dklmm",
+      "chịch"
   ];
   const attachment = new Attachment('https://i.imgur.com/iNoQ90z.png');
   var messReply = [
@@ -159,10 +162,20 @@ client.on("message", async message => {
     }
   }
 
+  if(command === 'cb') {
+    const CB = message.guild.members.find(x => x.displayName == 'Ebisu Miyuki');
+    message.delete().catch(O_o=>{}); 
+    message.channel.send("Ocschos, chịch không? " + CB);
+  }
+  if(command === 'akai') {
+    const CB = message.guild.members.find(x => x.displayName == 'Akai Gun');
+    message.delete().catch(O_o=>{}); 
+    message.channel.send("Chửi cl, chịch không? " + CB);
+  }
   if(command === 'cht') {
     const HT = message.guild.members.find(x => x.id == '376286646011822082');
     message.delete().catch(O_o=>{}); 
-    message.channel.send("ĐM " + HT);
+    message.channel.send("Chịch không? M nằm dưới thì được " + HT);
   }
   
   if(command === 'play') {
