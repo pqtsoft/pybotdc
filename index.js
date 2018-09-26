@@ -90,6 +90,8 @@ client.on("message", async message => {
       "bot ngu",
       "bo t ngu",
       "b o t ngu",
+      "đê ma ma",
+      "mất dạy",
       'lz',
       'loz',
       'lồn',
