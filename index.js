@@ -52,7 +52,6 @@ client.on("message", async message => {
   // and not get into a spam loop (we call that "botception").
   if(message.author.bot) return;
 
-  return;
   
   var filterFuckMess = [
       "ocschos",
