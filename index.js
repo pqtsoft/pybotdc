@@ -88,8 +88,6 @@ client.on("message", async message => {
       "đù",
       "cex",
       "cax",
-      "nu xi",
-      "nuxi",
       "vloz",
       "vlin",
       "đệt",
