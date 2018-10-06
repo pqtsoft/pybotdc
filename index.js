@@ -1,35 +1,49 @@
 // Load up the discord.js library
 const { Client, Attachment } = require("discord.js");
-
-// This is your client. Some people call it `bot`, some people call it `self`, 
-// some might call it `cootchie`. Either way, when you see `client.something`, or `bot.something`,
-// this is what we're refering to. Your client.
+var request = require('request');
 const client = new Client();
-
-// Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./config.json");
-// config.token contains the bot's token
-// config.prefix contains the message prefix.
-
 client.on("ready", () => {
-  // This event will run if the bot starts, and logs in, successfully.
   console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
-  // Example of changing the bot's playing game to something useful. `client.user` is what the
-  // docs refer to as the "ClientUser".
   client.user.setActivity(`Nô tì của Tiêu - Đang online ở ${client.guilds.size} servers`);
 });
 
 client.on("guildCreate", guild => {
-  // This event triggers when the bot joins a guild.
-  console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
   client.user.setActivity(`Nô tì của Tiêu - Đang online ở ${client.guilds.size} servers`);
 });
 
 client.on("guildDelete", guild => {
-  // this event triggers when the bot is removed from a guild.
-  console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
   client.user.setActivity(`Nô tì của Tiêu - Đang online ở ${client.guilds.size} servers`);
 });
+
+const YTDL = require('ytdl-core');
+const soundcloudr = require('soundcloudr');
+
+function isURL(str) {
+  var urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+  var url = new RegExp(urlRegex, 'i');
+  return str.length < 2083 && url.test(str);
+}
+
+function Play(connection, message, server) {
+  if(!server.queue[0]) {
+    connection.disconnect();
+  }
+  server.dispatcher = connection.playStream(YTDL(server.queue[0], { filter: 'audioonly' }));
+  server.playing = true;
+  server.queue.shift();
+  server.dispatcher.on("end", function () {
+    if(server.queue[0]) {
+      Play(connection, message, server);
+    }
+    else {
+      connection.disconnect();
+    }
+  })
+}
+
+servers = {};
+ids = [];
 
 var countFuck = [];
 
@@ -52,6 +66,7 @@ client.on("message", async message => {
   // and not get into a spam loop (we call that "botception").
   if(message.author.bot) return;
 
+  
   
   var filterFuckMess = [
       "ocschos",
@@ -203,16 +218,6 @@ client.on("message", async message => {
   
   // Let's go with a few common example commands! Feel free to delete or change those.
   
-  if(commands.indexOf(command) == -1) {
-    var request = require('request');
-    request('http://sandbox.api.simsimi.com/request.p?key=0bf9c6ca-0039-4701-be36-ad22b750201d&lc=en&ft=1.0&text=' + encodeURI(message.content.replace('+', '')), function (error, response, body) {
-        
-        const obj = JSON.parse(body);    
-        
-        message.channel.send(obj.response);
-    });
-    
-  }
 
   if(command === "avatar") {
     let member = message.mentions.users.first() || message.author;
@@ -256,87 +261,101 @@ client.on("message", async message => {
     message.channel.send(messFightReply[Math.floor(Math.random() * messFightReply.length)] + HT);
   }
   
-  if(command === 'play') {
+  if(command === 'move') {
     if (message.member.voiceChannel) {
-        const connection = await message.member.voiceChannel.join();
+      const connection = await message.member.voiceChannel.join();
     } else {
         message.reply('ĐMM. Vô voice đi đã rồi gọi tao.');
     }
   }
 
+  if(command === 'skip') {
+    const connection = await message.member.voiceChannel.join().then(connection => { 
+      
+      var server = servers[message.guild.id];
+      Play(connection, message, server);
+    });
+  }
+
+  if(command === 'play') {
+    if (message.member.voiceChannel) {
+          if(!servers[message.guild.id]) {
+            servers[message.guild.id] = {
+              queue: [],
+              playing: false
+            }
+          } 
+          
+          const connection = await message.member.voiceChannel.join().then(connection => {
+            var server = servers[message.guild.id];
+            
+            //message.reply("Ok, sủa tiếp đi.");
+            if(isURL(args[0])) {
+              server.queue.push(args[0]);
+              if(!server.playing) {
+                Play(connection, message, server);
+              }
+              
+            }
+            else {
+              request("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=" + args.join("+") + "&key=AIzaSyBe3MMdQEdtXUbJ1raY01KYSWSOcQZmjJk", function (error, response, body) {
+                  
+                  const obj = JSON.parse(body);    
+                  let items = [];
+                  let i = 1;
+                  obj.items.forEach(item => {
+                    items.push(i + " => " + item.snippet.title);
+                    ids.push(item.id.videoId);
+                    i++;
+                  });
+                  message.channel.send("```Chọn nhạc đi ocschos \n" + items.join("\n") + "```")
+                  .then(() => {
+                    message.channel.awaitMessages(response => response.content, {
+                      max: 1,
+                      time: 30000,
+                      errors: ['time'],
+                    })
+                    .then((collected) => {
+                      if(ids.length > 0 && parseInt(collected.first().content)) {
+                        const selected = parseInt(collected.first().content) - 1;
+                        const id = ids[selected];
+                        if(id) {
+                          server.queue.push("https://www.youtube.com/watch?v=" + id);
+                          if(!server.playing) {
+                            Play(connection, message, server);
+                          }
+                        }
+                        message.channel.send(`Add to queue: ${obj.items[selected].snippet.title}`); 
+                      }    
+                      console.log(server.queue);
+                    })
+                    .catch(() => {
+                      message.channel.send('There was no collected message that passed the filter within the time limit!');
+                    });
+                  });
+              });
+            }
+            
+          });
+        
+        
+    } else {
+        message.reply('ĐMM. Vô voice đi đã rồi gọi tao.');
+    }
+  }
+
+  if(command === 'leave') {
+    const connection = await message.member.voiceChannel.join().then(connection => {
+      connection.disconnect();
+    });
+  }
+
   if(command === "say") {
-    // makes the bot say something and delete the message. As an example, it's open to anyone to use. 
-    // To get the "message" itself we join the `args` back into a string with spaces: 
     const sayMessage = args.join(" ");
-    // Then we delete the command message (sneaky, right?). The catch just ignores the error with a cute smiley thing.
     message.delete().catch(O_o=>{}); 
-    // And we get the bot to say the thing: 
     message.channel.send(sayMessage);
   }
   
-  if(command === "kick") {
-    // This command must be limited to mods and admins. In this example we just hardcode the role names.
-    // Please read on Array.some() to understand this bit: 
-    // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/some?
-    if(!message.member.roles.some(r=>["Administrator", "Moderator"].includes(r.name)) )
-      return message.reply("Sorry, you don't have permissions to use this!");
-    
-    // Let's first check if we have a member and if we can kick them!
-    // message.mentions.members is a collection of people that have been mentioned, as GuildMembers.
-    // We can also support getting the member by ID, which would be args[0]
-    let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-    if(!member)
-      return message.reply("Please mention a valid member of this server");
-    if(!member.kickable) 
-      return message.reply("I cannot kick this user! Do they have a higher role? Do I have kick permissions?");
-    
-    // slice(1) removes the first part, which here should be the user mention or ID
-    // join(' ') takes all the various parts to make it a single string.
-    let reason = args.slice(1).join(' ');
-    if(!reason) reason = "No reason provided";
-    
-    // Now, time for a swift kick in the nuts!
-    await member.kick(reason)
-      .catch(error => message.reply(`Sorry ${message.author} I couldn't kick because of : ${error}`));
-    message.reply(`${member.user.tag} has been kicked by ${message.author.tag} because: ${reason}`);
-
-  }
-  
-  if(command === "ban") {
-    // Most of this command is identical to kick, except that here we'll only let admins do it.
-    // In the real world mods could ban too, but this is just an example, right? ;)
-    if(!message.member.roles.some(r=>["Administrator"].includes(r.name)) )
-      return message.reply("Sorry, you don't have permissions to use this!");
-    
-    let member = message.mentions.members.first();
-    if(!member)
-      return message.reply("Please mention a valid member of this server");
-    if(!member.bannable) 
-      return message.reply("I cannot ban this user! Do they have a higher role? Do I have ban permissions?");
-
-    let reason = args.slice(1).join(' ');
-    if(!reason) reason = "No reason provided";
-    
-    await member.ban(reason)
-      .catch(error => message.reply(`Sorry ${message.author} I couldn't ban because of : ${error}`));
-    message.reply(`${member.user.tag} has been banned by ${message.author.tag} because: ${reason}`);
-  }
-  
-  if(command === "purge") {
-    // This command removes all messages from all users in the channel, up to 100.
-    
-    // get the delete count, as an actual number.
-    const deleteCount = parseInt(args[0], 10);
-    
-    // Ooooh nice, combined conditions. <3
-    if(!deleteCount || deleteCount < 2 || deleteCount > 100)
-      return message.reply("Please provide a number between 2 and 100 for the number of messages to delete");
-    
-    // So we get our messages, and delete them. Simple enough, right?
-    const fetched = await message.channel.fetchMessages({limit: deleteCount});
-    message.channel.bulkDelete(fetched)
-      .catch(error => message.reply(`Couldn't delete messages because of: ${error}`));
-  }
 });
 
 client.login(config.token);
