@@ -3,6 +3,16 @@ const { Client, Attachment } = require("discord.js");
 var request = require('request');
 const client = new Client();
 const config = require("./config.json");
+
+const music = require('discord.js-music-v11');
+
+music(client, {
+	prefix: '+',        // Prefix of '-'.
+	global: false,      // Server-specific queues.
+	maxQueueSize: 20,   // Maximum queue size of 10.
+	clearInvoker: true, // If permissions applicable, allow the bot to delete the messages that invoke it (start with prefix)
+   // channel: 'music'    // Name of voice channel to join. If omitted, will instead join user's voice channel.
+});
 client.on("ready", () => {
   console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
   client.user.setActivity(`Nô tì của Tiêu - Đang online ở ${client.guilds.size} servers`);
@@ -16,34 +26,6 @@ client.on("guildDelete", guild => {
   client.user.setActivity(`Nô tì của Tiêu - Đang online ở ${client.guilds.size} servers`);
 });
 
-const YTDL = require('ytdl-core');
-const soundcloudr = require('soundcloudr');
-
-function isURL(str) {
-  var urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
-  var url = new RegExp(urlRegex, 'i');
-  return str.length < 2083 && url.test(str);
-}
-
-function Play(connection, message, server) {
-  if(!server.queue[0]) {
-    connection.disconnect();
-  }
-  server.dispatcher = connection.playStream(YTDL(server.queue[0], { filter: 'audioonly' }));
-  server.playing = true;
-  server.queue.shift();
-  server.dispatcher.on("end", function () {
-    if(server.queue[0]) {
-      Play(connection, message, server);
-    }
-    else {
-      connection.disconnect();
-    }
-  })
-}
-
-servers = {};
-ids = [];
 
 var countFuck = [];
 
@@ -261,95 +243,6 @@ client.on("message", async message => {
     message.channel.send(messFightReply[Math.floor(Math.random() * messFightReply.length)] + HT);
   }
   
-  if(command === 'move') {
-    if (message.member.voiceChannel) {
-      const connection = await message.member.voiceChannel.join();
-    } else {
-        message.reply('ĐMM. Vô voice đi đã rồi gọi tao.');
-    }
-  }
-
-  if(command === 'skip') {
-    const connection = await message.member.voiceChannel.join().then(connection => { 
-      
-      var server = servers[message.guild.id];
-      Play(connection, message, server);
-    });
-  }
-
-  if(command === 'play') {
-    if (message.member.voiceChannel) {
-          if(!servers[message.guild.id]) {
-            servers[message.guild.id] = {
-              queue: [],
-              playing: false
-            }
-          } 
-          
-          const connection = await message.member.voiceChannel.join().then(connection => {
-            var server = servers[message.guild.id];
-            
-            //message.reply("Ok, sủa tiếp đi.");
-            if(isURL(args[0])) {
-              server.queue.push(args[0]);
-              if(!server.playing) {
-                Play(connection, message, server);
-              }
-              
-            }
-            else {
-              request("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=" + args.join("+") + "&key=AIzaSyBe3MMdQEdtXUbJ1raY01KYSWSOcQZmjJk", function (error, response, body) {
-                  
-                  const obj = JSON.parse(body);    
-                  let items = [];
-                  let i = 1;
-                  obj.items.forEach(item => {
-                    items.push(i + " => " + item.snippet.title);
-                    ids.push(item.id.videoId);
-                    i++;
-                  });
-                  message.channel.send("```Chọn nhạc đi ocschos \n" + items.join("\n") + "```")
-                  .then(() => {
-                    message.channel.awaitMessages(response => response.content, {
-                      max: 1,
-                      time: 30000,
-                      errors: ['time'],
-                    })
-                    .then((collected) => {
-                      if(ids.length > 0 && parseInt(collected.first().content)) {
-                        const selected = parseInt(collected.first().content) - 1;
-                        const id = ids[selected];
-                        if(id) {
-                          server.queue.push("https://www.youtube.com/watch?v=" + id);
-                          if(!server.playing) {
-                            Play(connection, message, server);
-                          }
-                        }
-                        message.channel.send(`Add to queue: ${obj.items[selected].snippet.title}`); 
-                      }    
-                      console.log(server.queue);
-                    })
-                    .catch(() => {
-                      message.channel.send('There was no collected message that passed the filter within the time limit!');
-                    });
-                  });
-              });
-            }
-            
-          });
-        
-        
-    } else {
-        message.reply('ĐMM. Vô voice đi đã rồi gọi tao.');
-    }
-  }
-
-  if(command === 'leave') {
-    const connection = await message.member.voiceChannel.join().then(connection => {
-      connection.disconnect();
-    });
-  }
-
   if(command === "say") {
     const sayMessage = args.join(" ");
     message.delete().catch(O_o=>{}); 
@@ -357,5 +250,6 @@ client.on("message", async message => {
   }
   
 });
+
 
 client.login(config.token);
