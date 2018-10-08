@@ -4,14 +4,11 @@ var request = require('request');
 const client = new Client();
 const config = require("./config.json");
 
-const music = require('discord.js-music-v11');
+const Music = require('discord.js-musicbot-addon');
 
-music(client, {
-	prefix: '+',        // Prefix of '-'.
-	global: false,      // Server-specific queues.
-	maxQueueSize: 20,   // Maximum queue size of 10.
-	clearInvoker: true, // If permissions applicable, allow the bot to delete the messages that invoke it (start with prefix)
-   // channel: 'music'    // Name of voice channel to join. If omitted, will instead join user's voice channel.
+Music.start(client, {
+  youtubeKey: 'AIzaSyBe3MMdQEdtXUbJ1raY01KYSWSOcQZmjJk',
+  prefix: '+'
 });
 client.on("ready", () => {
   console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
