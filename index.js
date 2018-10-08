@@ -4,11 +4,12 @@ var request = require('request');
 const client = new Client();
 const config = require("./config.json");
 
-const Music = require('discord.js-musicbot-addon');
+const Music = require('./music.js');
 
 Music.start(client, {
   youtubeKey: 'AIzaSyBe3MMdQEdtXUbJ1raY01KYSWSOcQZmjJk',
-  prefix: '+'
+  prefix: '+',
+  anyoneCanLeave: true
 });
 client.on("ready", () => {
   console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
