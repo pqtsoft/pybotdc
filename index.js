@@ -7,7 +7,7 @@ const config = require("./config.json");
 const Music = require('./music.js');
 
 Music.start(client, {
-  youtubeKey: 'AIzaSyBe3MMdQEdtXUbJ1raY01KYSWSOcQZmjJk',
+  youtubeKey: '',
   prefix: '+',
   anyoneCanLeave: true,
   anyoneCanSkip: true,
